@@ -1,0 +1,63 @@
+﻿vBond# sh run
+system
+ host-name               vBond
+ system-ip               1.1.1.2
+ site-id                 1
+ admin-tech-on-failure
+ no route-consistency-check
+ organization-name       IMANMTZ
+ clock timezone Asia/Tehran
+ vbond 10.0.0.2 local
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  usergroup tenantadmin
+  !
+  user admin
+   password $6$KHnp1fQaZGO2zQ64$dWodJpR1AOTEM4hRfvy.nX1xs5shH6zYCl1q15JT7KO9KC5tn3xYZ/lhkIjiSfOFV3/JfimnnUUUCUwtJz2kd1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+ advertise connected
+ advertise static
+!
+security
+ ipsec
+  authentication-type ah-sha1-hmac sha1-hmac
+ !
+!
+vpn 0
+ interface ge0/0
+  ip address 10.0.0.2/24
+  ipv6 dhcp-client
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+ interface eth0
+  ip dhcp-client
+  ipv6 dhcp-client
+  no shutdown
+ !
+!
