@@ -1,0 +1,50 @@
+﻿cEdge4-2# sho
+cEdge4-2# show sdwa
+cEdge4-2# show sdwan runn
+cEdge4-2# show sdwan running-config 
+system
+ system-ip             1.1.4.2
+ overlay-id            1
+ site-id               4
+ port-offset           0
+ control-session-pps   300
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ port-hop
+ track-transport
+ track-default-gateway
+ console-baud-rate     9600
+ vbond 10.0.0.2 port 12346
+!
+no service pad
+service password-encryption
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service tcp-small-servers
+no service udp-small-servers
+platform console serial
+platform punt-keepalive disable-kernel-core
+hostname cEdge4-2
+username admin privilege 15 secret 9 $9$3V6L3V6L2VUI2k$ysPnXOdg8RLj9KgMdmfHdSHkdaMmiHzGaUpcqH6pfTo
+vrf definition 1
+ rd 1:1
+ address-family ipv4
+  route-target export 1:1
+  route-target import 1:1
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+vrf definition Mgmt-intf
+ description Transport VPN
+ rd          1:512
+ address-family ipv4
+  route-target export 1:512
+  route-target import 1:512
+  exit-address-family
+ !
+ address-family ipv6
+          
