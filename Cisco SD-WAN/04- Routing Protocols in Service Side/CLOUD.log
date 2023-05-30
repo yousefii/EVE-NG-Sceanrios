@@ -1,0 +1,135 @@
+﻿Compressed configuration from 3071 bytes to 1475 bytes[OK]
+*May 30 09:07:33.831: %GRUB-5-CONFIG_WRITING: GRUB configuration is being updated on disk. Please wait...
+*May 30 09:07:34.816: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.
+CLOUD(config)#do sh run
+Building configuration...
+
+Current configuration : 3071 bytes
+!
+! Last configuration change at 06:18:01 UTC Tue May 30 2023
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname CLOUD
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!         
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+interface GigabitEthernet0/0
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ negotiation auto
+!
+interface GigabitEthernet0/3
+ no switchport
+ ip address 100.0.0.254 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet1/0
+ no switchport
+ ip address 101.0.0.254 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+interface GigabitEthernet1/2
+ negotiation auto
+!
+interface GigabitEthernet1/3
+ negotiation auto
+!
+interface Vlan1
+ ip address 10.0.0.1 255.255.255.0
+!
+ip forward-protocol nd
+!
+ip http server
+!
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+!
+!
+end
+

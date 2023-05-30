@@ -1,0 +1,356 @@
+﻿ource: LOCAL] [localport: 0] at 09:46:03 UTC Tue May 30 2023
+cEdge6>en
+cEdge6#sh run
+Building configuration...
+
+Current configuration : 8734 bytes
+!
+! Last configuration change at 08:11:01 UTC Tue May 30 2023 by NETCONF
+!
+version 16.12
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+! Call-home is enabled by Smart-Licensing.
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+platform inspect match-statistics per-filter
+platform console serial
+!
+hostname cEdge6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition 1
+ rd 1:1
+ !
+ address-family ipv4
+  route-target export 1:1
+  route-target import 1:1
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition 65528
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition Mgmt-intf
+ description Transport VPN
+ rd 1:512
+ !
+ address-family ipv4
+  route-target export 1:512
+  route-target import 1:512
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 512000
+logging persistent
+no logging rate-limit
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization exec default local 
+!
+!
+!
+!
+!
+aaa session-id common
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+fhrp version vrrp v3
+!
+!
+!
+!
+!
+!
+!
+no ip dhcp use class
+!
+!
+!
+no ip igmp ssm-map query dns
+login on-success log
+ipv6 unicast-routing
+!
+!         
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-733574811
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-733574811
+ revocation-check crl
+ rsakeypair TP-self-signed-733574811
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-733574811
+ certificate self-signed 01
+  3082032E 30820216 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 37333335 37343831 31301E17 0D323330 35333030 36313534 
+  375A170D 33303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F 
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3733 33353734 
+  38313130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 82010A02 
+  82010100 B39B00D4 A907E84D 3291B289 E245DCD4 DFD718C8 9B1B3B5F B95654E5 
+  C1B33C70 C5F73988 BFCFB593 9F5B35AE FD7588AF 5312CFF4 FA9C3017 5D544A53 
+  95571211 BBE0DF22 276DEF70 FE6488DE 04E9D3A7 9A9441AA 5CFCD280 B49C66BF 
+  BC97C15D 456BBE82 77DD885C 79478278 8007530E 6D6FF826 E10CDA42 AC6D44CB 
+  1E86E7FA 5A6DB4CA 87552FBD 9F66596F E58C40B2 7489194E 1F2543B5 E102A899 
+  E5CE249F 881FBD2B 927C1373 25D8AB54 5AB01F76 B9C5C475 28EB1FAD E2C9CD8E 
+  664DDD70 9A0B5EF1 259695F7 D0134444 09B55543 A0244000 39AA831B 736F260C 
+  A09C7B52 C244C513 96ABD32E 4004DC57 A9B3C5AD EAB21B3A 9C98C5B3 E92B4834 
+  8FBF0E0D 02030100 01A35330 51300F06 03551D13 0101FF04 05300301 01FF301F 
+  0603551D 23041830 168014CA 38ABF36A 70DA5B73 A3366BDF AC5DE478 56647E30 
+  1D060355 1D0E0416 0414CA38 ABF36A70 DA5B73A3 366BDFAC 5DE47856 647E300D 
+  06092A86 4886F70D 01010505 00038201 01002CD7 A0296653 977DE836 9063AE96 
+  ACBD13D6 69A86AF2 39A33C26 7D5669B8 CFC24389 7B122B56 7B494A49 B9A84C45 
+  6118BB2A F91A6FBC 8DB5494B 5C2571B9 5E6FD096 EA0FC672 F6D8A2FA 5B54F3D8 
+  7156D994 436CE354 142E64BC E4CBDEF5 79099B68 122DDDFD 97D20785 BD874ACB 
+  C351A52E BC71A81D FFA73D55 CA0D05EB 56671E5D F6753C6F CA66BADD D8427001 
+  0CE768BE 2BCBB89C CBD3FD26 ADBF39ED 97D621FC 0D4516F3 E6456810 D35DCC28 
+  2FE01065 69BD7EE2 415EA240 79B4B26A 3274A6F5 5D7B944E 68F9B669 BEF48A0D 
+  66B12A48 7C14A2EE A7B46573 1C5B23A3 A234E883 FA4AA86E C333B972 F53689FD 
+  34E0B905 862F8E0D 055BE6B4 2E06E48E 706D
+        quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+        quit
+!
+license udi pid CSR1000V sn 9UHJK8SQ86E
+diagnostic bootup level minimal
+memory free low-watermark processor 72329
+!
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$3V6L3V6L2VUI2k$ysPnXOdg8RLj9KgMdmfHdSHkdaMmiHzGaUpcqH6pfTo
+!
+redundancy
+!
+!
+!
+no crypto ikev2 diagnose error
+!
+!         
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback65528
+ vrf forwarding 65528
+ ip address 192.168.1.1 255.255.255.255
+!         
+interface Tunnel1
+ ip unnumbered GigabitEthernet1
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet1
+ no ipv6 redirects
+ tunnel source GigabitEthernet1
+ tunnel mode sdwan
+!
+interface Tunnel2
+ ip unnumbered GigabitEthernet2
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet2
+ no ipv6 redirects
+ tunnel source GigabitEthernet2
+ tunnel mode sdwan
+!
+interface GigabitEthernet1
+ ip address 100.0.0.6 255.255.255.0
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!         
+interface GigabitEthernet2
+ ip address 101.0.0.6 255.255.255.0
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet3
+ vrf forwarding 1
+ ip address 172.16.6.1 255.255.255.252
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet4
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+router omp
+!         
+router bgp 1
+ bgp log-neighbor-changes
+ distance bgp 20 200 20
+ !
+ address-family ipv4 vrf 1
+  bgp router-id 1.0.6.1
+  redistribute omp
+  neighbor 172.16.6.2 remote-as 1
+  neighbor 172.16.6.2 activate
+  neighbor 172.16.6.2 send-community both
+ exit-address-family
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+!
+ip nat route vrf 65528 0.0.0.0 0.0.0.0 global
+no ip nat service skinny tcp port 2000
+no ip nat service sip tcp port 5060
+no ip nat service sip udp port 5060
+no ip nat service H225
+no ip nat service ras
+no ip nat service rtsp udp
+no ip nat service rtsp tcp
+no ip nat service dns tcp
+no ip nat service dns udp
+no ip nat service netbios-ns tcp
+no ip nat service netbios-ns udp
+no ip nat service netbios-ssn
+no ip nat service netbios-dgm
+no ip nat service ldap
+no ip nat service sunrpc udp
+no ip nat service sunrpc tcp
+no ip nat service msrpc tcp
+no ip nat service tftp
+no ip nat service rcmd
+no ip nat service pptp
+no ip nat service ftp
+no ip nat service gatekeeper
+no ip nat service dns-reset-ttl
+ip route 0.0.0.0 0.0.0.0 100.0.0.254
+ip route 0.0.0.0 0.0.0.0 101.0.0.254
+ip route vrf 1 6.6.6.6 255.255.255.255 172.16.6.2
+ip scp server enable
+!
+!         
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 80
+ transport input ssh
+!
+nat64 translation timeout udp 1
+nat64 translation timeout tcp 60
+!
+!
+!
+!
+!
+netconf-yang
+netconf-yang feature candidate-datastore
+end
+

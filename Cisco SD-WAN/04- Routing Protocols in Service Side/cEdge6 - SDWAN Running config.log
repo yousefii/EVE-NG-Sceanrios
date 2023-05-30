@@ -1,0 +1,254 @@
+﻿cEdge6#  sh sdwan runn
+cEdge6#  sh sdwan running-config 
+system
+ system-ip             1.0.6.1
+ overlay-id            1
+ site-id               6
+ port-offset           0
+ control-session-pps   300
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ port-hop
+ track-transport
+ track-default-gateway
+ console-baud-rate     9600
+ vbond 10.0.0.2 port 12346
+!
+no service pad
+service password-encryption
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service tcp-small-servers
+no service udp-small-servers
+platform console serial
+platform punt-keepalive disable-kernel-core
+hostname cEdge6
+username admin privilege 15 secret 9 $9$3V6L3V6L2VUI2k$ysPnXOdg8RLj9KgMdmfHdSHkdaMmiHzGaUpcqH6pfTo
+vrf definition 1
+ rd 1:1
+ address-family ipv4
+  route-target export 1:1
+  route-target import 1:1
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+vrf definition Mgmt-intf
+ description Transport VPN
+ rd          1:512
+ address-family ipv4
+  route-target export 1:512
+  route-target import 1:512
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+no ip dhcp use class
+ip route 0.0.0.0 0.0.0.0 100.0.0.254 1
+ip route 0.0.0.0 0.0.0.0 101.0.0.254 1
+ip route vrf 1 6.6.6.6 255.255.255.255 172.16.6.2 1
+no ip http server
+ip http secure-server
+no ip http ctc authentication
+no ip igmp ssm-map query dns
+ipv6 unicast-routing
+interface GigabitEthernet1
+ no shutdown
+ arp timeout 1200
+ ip address 100.0.0.6 255.255.255.0
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet2
+ no shutdown
+ arp timeout 1200
+ ip address 101.0.0.6 255.255.255.0
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet3
+ no shutdown
+ arp timeout 1200
+ vrf forwarding 1
+ ip address 172.16.6.1 255.255.255.252
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet4
+ no shutdown
+ no ip address
+exit
+interface Tunnel1
+ no shutdown
+ ip unnumbered GigabitEthernet1
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet1
+ no ipv6 redirects
+ tunnel source GigabitEthernet1
+ tunnel mode sdwan
+exit
+interface Tunnel2
+ no shutdown
+ ip unnumbered GigabitEthernet2
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet2
+ no ipv6 redirects
+ tunnel source GigabitEthernet2
+ tunnel mode sdwan
+exit
+clock timezone UTC 0 0
+logging persistent size 104857600 filesize 10485760
+logging buffered 512000
+no logging rate-limit
+logging persistent
+aaa authentication login default local
+aaa authorization exec default local
+no crypto ikev2 diagnose error
+no crypto isakmp diagnose error
+crypto pki trustpoint TP-self-signed-733574811
+ enrollment selfsigned
+ revocation-check crl
+!
+router bgp 1
+ bgp log-neighbor-changes
+ distance bgp 20 200 20
+ address-family ipv4 unicast vrf 1
+  bgp router-id 1.0.6.1
+  neighbor 172.16.6.2 remote-as 1
+  neighbor 172.16.6.2 activate
+  neighbor 172.16.6.2 ebgp-multihop 1
+  neighbor 172.16.6.2 send-community both
+  redistribute omp
+  exit-address-family
+ !
+ timers bgp 60 180
+!
+line con 0
+ login authentication default
+ speed    9600
+ stopbits 1
+!
+line vty 0 4
+ login authentication default
+ transport input ssh
+!
+line vty 5 80
+ login authentication default
+ transport input ssh
+!
+nat64 translation timeout tcp 60
+nat64 translation timeout udp 1
+sdwan
+ interface GigabitEthernet1
+  tunnel-interface
+   encapsulation ipsec weight 1
+   no border
+   color biz-internet restrict
+   no last-resort-circuit
+   no low-bandwidth-link
+   control-connections
+   no vbond-as-stun-server
+   vmanage-connection-preference 5
+   port-hop
+   carrier                       default
+   nat-refresh-interval          5
+   hello-interval                1000
+   hello-tolerance               12
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   no allow-service snmp
+  exit
+ exit
+ interface GigabitEthernet2
+  tunnel-interface
+   encapsulation ipsec weight 1
+   no border
+   color mpls restrict
+   no last-resort-circuit
+   no low-bandwidth-link
+   control-connections
+   no vbond-as-stun-server
+   vmanage-connection-preference 5
+   port-hop
+   carrier                       default
+   nat-refresh-interval          5
+   hello-interval                1000
+   hello-tolerance               12
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   no allow-service snmp
+  exit
+ exit
+ omp      
+  no shutdown
+  send-path-limit  4
+  ecmp-limit       4
+  graceful-restart
+  no as-dot-notation
+  timers
+   holdtime               60
+   advertisement-interval 1
+   graceful-restart-timer 43200
+   eor-timer              300
+  exit
+  address-family ipv4 vrf 1
+   advertise connected
+   advertise static
+  !
+  address-family ipv4
+   advertise connected
+   advertise static
+  !
+  address-family ipv6
+   advertise connected
+   advertise static
+  !       
+ !
+!
+licensing config enable false
+licensing config privacy hostname false
+licensing config privacy version false
+licensing config utility utility-enable false
+netconf-yang cisco-ia blocking cli-blocking-enabled
+bfd app-route multiplier 6
+bfd app-route poll-interval 600000
+omp
+ no as-dot-notation
+!
+security
+ ipsec
+  rekey               86400
+  replay-window       512
+  authentication-type sha1-hmac ah-sha1-hmac
+ !
+!
+nacm cmd-read-default deny
+nacm cmd-exec-default deny
+
