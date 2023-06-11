@@ -1,0 +1,83 @@
+﻿
+viptela 19.3.0 
+
+vBond login: admin
+Password: 
+Welcome to Viptela CLI
+admin connected from 127.0.0.1 using console on vBond
+vBond# show run
+system
+ host-name               vBond
+ system-ip               1.0.0.2
+ site-id                 100
+ admin-tech-on-failure
+ no route-consistency-check
+ organization-name       IMANMTZ
+ vbond 10.0.0.2 local
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  usergroup tenantadmin
+  !
+  user admin
+   password $6$AJXLtKKF/XH31Nye$j8pOFBn0N8gHcnfBU66IhgcZS2JFni8RdSoVzKDS9htLywQD8lTXGgOa0SUMF35CGzdNap6GxTNpSAHqyWDOR/
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+ advertise connected
+ advertise static
+!
+security
+ ipsec
+  authentication-type ah-sha1-hmac sha1-hmac
+ !
+!
+vpn 0
+ interface ge0/0
+  ip address 10.0.0.2/24
+  ipv6 dhcp-client
+  tunnel-interface
+   encapsulation ipsec
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   allow-service https
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+ interface eth0
+  ip dhcp-client
+  ipv6 dhcp-client
+  no shutdown
+ !
+!
