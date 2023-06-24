@@ -1,0 +1,118 @@
+﻿vsmart# sh run
+system
+ host-name             vsmart
+ system-ip             1.0.0.4
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.4/24
+  tunnel-interface
+   color mpls
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+!
+policy
+ lists
+  site-list DC1
+   site-id 1
+  !
+  site-list DC2
+   site-id 2
+  !
+  site-list DC2-PRIMARY
+   site-id 5
+  !
+  prefix-list INTERNET-PREFIX
+   ip-prefix 8.8.8.8/32
+  !
+ !
+ control-policy DC-2-TOPOLOGY
+  sequence 1
+   match tloc
+    site-list DC1
+   !
+   action accept
+   !
+  !
+  sequence 11
+   match tloc
+    site-list DC2
+   !
+   action accept
+   !
+  !
+  sequence 21
+   match route
+    prefix-list INTERNET-PREFIX
+    site-list   DC2
+   !
+   action accept
+    set
+     preference 200
+    !
+   !
+  !
+  sequence 31
+   match route
+    prefix-list INTERNET-PREFIX
+    site-list   DC1
+   !
+   action accept
+    set
+     preference 100
+    !
+   !
+  !
+  default-action reject
+ !
+!
+apply-policy
+ site-list DC2-PRIMARY
+  control-policy DC-2-TOPOLOGY out
+ !
+!
