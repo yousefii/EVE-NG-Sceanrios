@@ -1,0 +1,156 @@
+﻿vsmart# sh run
+system
+ host-name             vsmart
+ system-ip             1.0.0.4
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.4/24
+  tunnel-interface
+   color biz-internet
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+!
+policy
+ lists
+  vpn-list VPN1
+   vpn 1
+  !
+  vpn-list VPN2
+   vpn 2
+  !
+  vpn-list VPN3
+   vpn 3
+  !
+  tloc-list DC-TLOC
+   tloc 1.0.1.1 color biz-internet encap ipsec
+  !
+  site-list BRANCH
+   site-id 2-4
+  !
+  site-list DC
+   site-id 1
+  !
+  prefix-list _AnyIpv4PrefixList
+   ip-prefix 0.0.0.0/0 le 32
+  !
+ !
+ control-policy Topology-per-VPN
+  sequence 1
+   match tloc
+    site-list DC
+   !
+   action accept
+   !
+  !
+  sequence 11
+   match tloc
+    site-list BRANCH
+   !
+   action accept
+   !
+  !
+  sequence 21
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   DC
+    vpn-list    VPN2
+   !
+   action accept
+    set
+     tloc-list DC-TLOC
+    !
+   !
+  !
+  sequence 31
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   DC
+    vpn-list    VPN3
+   !
+   action accept
+   !
+  !
+  sequence 41
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   BRANCH
+    vpn-list    VPN3
+   !
+   action accept
+    set
+     tloc-list DC-TLOC
+    !
+   !
+  !
+  sequence 51
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   BRANCH
+    vpn-list    VPN1
+   !
+   action accept
+   !
+  !
+  sequence 61
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   DC
+    vpn-list    VPN1
+   !
+   action accept
+   !
+  !
+  default-action reject
+ !
+!
+apply-policy
+ site-list BRANCH
+  control-policy Topology-per-VPN out
+ !
+!
