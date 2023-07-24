@@ -1,0 +1,154 @@
+﻿vsmart# sh run
+system
+ host-name             vsmart
+ system-ip             1.0.0.4
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.4/24
+  tunnel-interface
+   color biz-internet
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+!
+policy
+ data-policy _GUEST-VPN_DATA-POLICY
+  vpn-list GUEST-VPN
+   sequence 1
+    match
+     destination-data-prefix-list PRAIVATE-RANGE
+    !
+    action drop
+     count Guest-Drop-Count_1477249917
+    !
+   !
+   sequence 11
+    match
+     destination-ip 0.0.0.0/0
+    !
+    action accept
+     count Guest-Permit-Count_1477249917
+     nat use-vpn 0
+    !
+   !
+   default-action drop
+  !
+ !
+ lists
+  vpn-list CORPORATE-VPN
+   vpn 1
+  !
+  vpn-list GUEST-VPN
+   vpn 2
+  !
+  data-prefix-list PRAIVATE-RANGE
+   ip-prefix 10.0.0.0/8
+   ip-prefix 172.16.0.0/24
+   ip-prefix 192.168.0.0/16
+  !
+  tloc-list DC-TLOC
+   tloc 1.0.1.1 color biz-internet encap ipsec
+  !
+  site-list BRANCHS
+   site-id 2-4
+  !
+  site-list DC
+   site-id 1
+  !
+  prefix-list _AnyIpv4PrefixList
+   ip-prefix 0.0.0.0/0 le 32
+  !
+ !
+ control-policy Conrtol-Topology
+  sequence 1
+   match tloc
+    site-list DC
+   !
+   action accept
+   !
+  !
+  sequence 11
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   DC
+   !
+   action accept
+   !
+  !
+  sequence 21
+   match route
+    prefix-list _AnyIpv4PrefixList
+    site-list   BRANCHS
+    vpn-list    CORPORATE-VPN
+   !
+   action accept
+    set
+     tloc-list DC-TLOC
+    !
+   !
+  !
+  default-action reject
+ !
+ vpn-membership vpnMembership_713349118
+  sequence 10
+   match
+    vpn-list CORPORATE-VPN
+   !
+   action accept
+   !
+  !
+  default-action reject
+ !
+!
+apply-policy
+ site-list BRANCHS
+  control-policy Conrtol-Topology out
+  data-policy _GUEST-VPN_DATA-POLICY from-service
+  vpn-membership vpnMembership_713349118
+ !
+!

@@ -1,0 +1,129 @@
+﻿vEdge4# sh run
+system
+ host-name               vEdge4
+ system-ip               1.0.4.1
+ site-id                 4
+ admin-tech-on-failure
+ no route-consistency-check
+ sp-organization-name    IMANMTZ
+ organization-name       IMANMTZ
+ console-baud-rate       9600
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+ advertise connected
+ advertise static
+!
+security
+ ipsec
+  authentication-type sha1-hmac ah-sha1-hmac
+ !
+!
+vpn 0
+ interface ge0/0
+  ip address 100.0.0.4/24
+  nat
+   no block-icmp-error
+   respond-to-ping
+  !
+  tunnel-interface
+   encapsulation ipsec
+   color biz-internet
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   allow-service https
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 100.0.0.100
+!
+vpn 1
+ interface ge0/1
+  ip address 192.168.4.1/24
+  no shutdown
+ !
+ omp
+  advertise connected
+ !
+!
+vpn 2
+ interface ge0/2
+  ip address 172.16.4.1/24
+  no shutdown
+ !
+ ip route 0.0.0.0/0 vpn 0
+ omp
+  advertise connected
+ !
+!
+vpn 512
+ interface eth0
+  ip dhcp-client
+  no shutdown
+ !
+!
+vEdge4#    
+vEdge4# 
+vEdge4# 
+vEdge4# 
+vEdge4# 
+vEdge4# show policy from-vsmart 
+from-vsmart data-policy _GUEST-VPN_DATA-POLICY
+ direction from-service
+ vpn-list GUEST-VPN
+  sequence 1
+   match
+    destination-data-prefix-list PRAIVATE-RANGE
+   action drop
+    count Guest-Drop-Count_1477249917
+  sequence 11
+   match
+    destination-ip 0.0.0.0/0
+   action accept
+    count Guest-Permit-Count_1477249917
+    nat use-vpn 0
+    no nat fallback
+  default-action drop
+from-vsmart lists vpn-list GUEST-VPN
+ vpn 2
+from-vsmart lists data-prefix-list PRAIVATE-RANGE
+ ip-prefix 10.0.0.0/8
+ ip-prefix 172.16.0.0/24
+ ip-prefix 192.168.0.0/16
+vEdge4#    
+vEdge4# 
+vEdge4# 
