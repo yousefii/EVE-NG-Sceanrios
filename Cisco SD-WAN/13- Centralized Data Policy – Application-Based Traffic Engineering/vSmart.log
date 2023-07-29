@@ -1,0 +1,118 @@
+﻿vsmart# sh run
+system
+ host-name             vsmart
+ system-ip             1.0.0.4
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.4/24
+  tunnel-interface
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+!
+policy
+ data-policy _VPN1_app-policy1
+  vpn-list VPN1
+   sequence 1
+    match
+     source-ip 0.0.0.0/0
+     app-list  FACEBOOK
+    !
+    action accept
+     count Facebook-Count_1691108686
+     set
+      local-tloc-list
+       color biz-internet
+      !
+     !
+    !
+   !
+   sequence 11
+    match
+     source-ip 0.0.0.0/0
+     app-list  YOUTUBE
+    !
+    action accept
+     count youtube-counter_1691108686
+     set
+      vpn       1
+      tloc-list BRANCH2-INET-TLOC
+     !
+    !
+   !
+   default-action drop
+  !
+ !
+ lists
+  vpn-list VPN1
+   vpn 1
+  !
+  tloc-list BRANCH2-INET-TLOC
+   tloc 1.0.2.1 color biz-internet encap ipsec
+  !
+  app-list FACEBOOK
+   app facebook
+   app facebook_live
+   app facebook_mail
+   app facebook_messenger
+   app fbcdn
+  !
+  app-list YOUTUBE
+   app youtube
+   app youtube_hd
+  !
+  site-list BRANCH1
+   site-id 1
+  !
+ !
+!
+apply-policy
+ site-list BRANCH1
+  data-policy _VPN1_app-policy1 from-service
+ !
+!
