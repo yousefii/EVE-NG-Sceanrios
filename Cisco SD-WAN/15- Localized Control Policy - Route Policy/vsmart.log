@@ -1,0 +1,59 @@
+﻿
+vsmart# sh run
+system
+ host-name             vsmart
+ system-ip             1.0.0.4
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.4/24
+  tunnel-interface
+   color biz-internet
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+!

@@ -1,0 +1,128 @@
+﻿
+viptela 19.3.0 
+
+vEdge2 login: admin
+Password: 
+Welcome to Viptela CLI
+admin connected from 127.0.0.1 using console on vEdge2
+vEdge2# sh run
+system
+ host-name               vEdge2
+ system-ip               1.0.1.2
+ site-id                 1
+ admin-tech-on-failure
+ no route-consistency-check
+ sp-organization-name    IMANMTZ
+ organization-name       IMANMTZ
+ console-baud-rate       9600
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  user admin
+   password $6$siwKBQ==$wT2lUa9BSreDPI6gB8sl4E6PAJoVXgMbgv/whJ8F1C6sWdRazdxorYYTLrL6syiG6qnLABTnrE96HJiKF6QRq1
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+omp
+ no shutdown
+ graceful-restart
+ advertise connected
+ advertise static
+!
+security
+ ipsec
+  authentication-type sha1-hmac ah-sha1-hmac
+ !
+!
+vpn 0
+ interface ge0/0
+  ip address 100.0.0.2/24
+  tunnel-interface
+   encapsulation ipsec
+   color biz-internet
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   allow-service https
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 100.0.0.100
+!
+vpn 1
+ router
+  bgp 1
+   address-family ipv4-unicast
+    redistribute omp
+   !
+   neighbor 192.168.2.2
+    no shutdown
+    remote-as 1
+    address-family ipv4-unicast
+     route-policy Local-Pref-200 out
+    !
+   !
+  !
+ !
+ interface ge0/1
+  ip address 192.168.2.1/30
+  no shutdown
+ !
+ omp
+  advertise bgp
+  advertise connected
+ !
+!
+vpn 512
+ interface eth0
+  ip dhcp-client
+  no shutdown
+ !
+!
+policy
+ route-policy Local-Pref-100
+  sequence 1
+   action accept
+    set
+     local-preference 100
+    !
+   !
+  !
+  default-action reject
+ !
+ route-policy Local-Pref-200
+  sequence 1
+   action accept
+    set
+     local-preference 200
+    !
+   !
+  !
+  default-action reject
+ !
+!
