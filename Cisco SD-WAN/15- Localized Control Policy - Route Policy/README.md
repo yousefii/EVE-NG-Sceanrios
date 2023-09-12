@@ -1,1 +1,1 @@
-![Scenario pic](https://github.com/yousefii/EVE-NG-Sceanrios/assets/94950365/ef120dfd-f852-4cc6-bd3c-954db5ea527b)
+![Scenario pic](https://github.com/yousefii/EVE-NG-Sceanrios/assets/94950365/cdb390c4-759a-4a0c-a1d1-bc43504f88bd)
