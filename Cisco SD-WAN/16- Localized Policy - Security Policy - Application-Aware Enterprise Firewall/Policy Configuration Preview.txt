@@ -1,0 +1,58 @@
+policy
+ zone-based-policy Telnet-SSH-Policy
+    sequence 1
+     match
+      destination-port 23
+      protocol 6
+      protocol-name telnet
+     !
+     action drop
+      log
+     !
+    !
+    sequence 11
+     action pass
+      log
+     !
+    !
+  default-action drop
+ !
+  zone Zone1
+   vpn 1 
+  !
+  zone Zone2
+   vpn 2 
+  !
+  zone-pair ZP_Zone1_Zone1_Telnet-SSH-Policy
+   source-zone Zone1
+   destination-zone Zone1
+   zone-policy Telnet-SSH-Policy
+  !
+  zone-pair ZP_Zone1_Zone2_Telnet-SSH-Policy
+   source-zone Zone1
+   destination-zone Zone2
+   zone-policy Telnet-SSH-Policy
+  !
+  zone-pair ZP_Zone2_Zone2_Telnet-SSH-Policy
+   source-zone Zone2
+   destination-zone Zone2
+   zone-policy Telnet-SSH-Policy
+  !
+  zone-pair ZP_Zone2_Zone1_Telnet-SSH-Policy
+   source-zone Zone2
+   destination-zone Zone1
+   zone-policy Telnet-SSH-Policy
+  !
+  zone-pair ZP_self_Zone1_Telnet-SSH-Policy
+   source-zone self
+   destination-zone Zone1
+   zone-policy Telnet-SSH-Policy
+  !
+  zone-pair ZP_self_Zone2_Telnet-SSH-Policy
+   source-zone self
+   destination-zone Zone2
+   zone-policy Telnet-SSH-Policy
+  !
+ !
+ zone-to-nozone-internet deny
+!

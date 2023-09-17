@@ -1,0 +1,702 @@
+cEdge2#sh run
+Building configuration...
+
+Current configuration : 10052 bytes
+!
+! Last configuration change at 04:45:50 UTC Sun Sep 17 2023 by NETCONF
+!
+version 16.12
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+! Call-home is enabled by Smart-Licensing.
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+platform inspect match-statistics per-filter
+platform console serial
+!
+hostname cEdge2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition 1
+ rd 1:1
+ !
+ address-family ipv4
+  route-target export 1:1
+  route-target import 1:1
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition 2
+ rd 1:2
+ !
+ address-family ipv4
+  route-target export 1:2
+  route-target import 1:2
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition 65528
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition Mgmt-intf
+ description Transport VPN
+ rd 1:512
+ !
+ address-family ipv4
+  route-target export 1:512
+  route-target import 1:512
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 512000
+logging persistent
+no logging rate-limit
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization exec default local 
+!
+!
+!
+!
+!
+aaa session-id common
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+fhrp version vrrp v3
+no ip source-route
+!
+!
+!
+!
+!
+!
+!
+no ip dhcp use class
+!
+!
+!
+no ip igmp ssm-map query dns
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+
+parameter-map type inspect-global
+ log dropped-packets
+ multi-tenancy
+ vpn zone security
+ alert on
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-1215007786
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1215007786
+ revocation-check none
+ rsakeypair TP-self-signed-1215007786
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-1215007786
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31323135 30303737 3836301E 170D3233 30393137 30343436 
+  30325A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 32313530 
+  30373738 36308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100ABCD EC6CB9C4 C41C3358 1EC7E77A B0E2E13B 0E1DE6AD FC29F98E 
+  032DEAD8 40625DD1 DD5E937B 4EB3B740 9F500069 3BDCA23E EB343C47 A5C8FFDE 
+  9EC1E9ED C2D014BA 2B8468C8 96AC259C 37AF2564 922D198E B701C508 E920D78F 
+  3B54F1F5 8D56BB72 CAE7637B 96874BC6 854543B3 19A7F964 DBD8E03A DB0CB14C 
+  07D0044C 52F23F46 7E4C20DA 7130AA47 0CA2C970 616536DD 8DDC4DE5 D14EA7BE 
+  CA03D538 E68E9AD9 9B77C3DC 02A56E4C D25C69B1 E8621F20 D0715389 590F827F 
+  08CE820B 93637432 0768FFAF D86687F7 DB113D4F 128D86EF 54B5FD86 0334534A 
+  8B5F7070 7F81016B 8A4AA269 41C7E882 4AB8D9DA 0BFE5BD9 D302F1F8 5C3D2AC0 
+  140FFCC1 4A210203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 148D5114 84295534 2986649C 5A5FA9E4 F38E4B2E 
+  F3301D06 03551D0E 04160414 8D511484 29553429 86649C5A 5FA9E4F3 8E4B2EF3 
+  300D0609 2A864886 F70D0101 05050003 82010100 6F9715EC EC35D948 9604AC89 
+  09306228 530AB656 0ED62FE2 1B0E56B9 C81BCF1A 589BC01A 3DD93326 6BC03307 
+  16AC95C6 46F56D63 302BBD2A F1DF7656 A6A731FA 8E39FE8F CF029924 DB954D05 
+  A883A14C 53706678 36774D71 EA4F505A 7EE37CF1 1E97E4BC ABE27D0C 9EC9E6BF 
+  8DEE2C7C 92218EAF 67DDE9A1 AB887604 3ADC9E36 0C18FD6D 5AAB4CDD 1EF4074C 
+  D1985D9D C9E519B8 2C8A9EAA E39AF7F1 47252FCC 1E8C4B70 21382530 89CF403B 
+  2B22409D 2F7D8B4A 95C583A9 8EE450DF 1C67A73C 32AA2109 D25B9680 CA808DE3 
+  DE43C0A6 77A9B5B4 1B544A28 BC2AB46C 58AC4A92 94DB481F F5B2DEC6 6D048D36 
+  F9D80B2D 5B0B7C53 2B01148F 47FE12F9 6A294E10
+        quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+        quit
+!
+license udi pid CSR1000V sn 938WRH0V92T
+diagnostic bootup level minimal
+memory free low-watermark processor 72329
+!
+!
+!
+!
+!
+object-group service Telnet-SSH-Policy-seq-11-service-og_ 
+ ip
+!
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$3V6L3V6L2VUI2k$ysPnXOdg8RLj9KgMdmfHdSHkdaMmiHzGaUpcqH6pfTo
+!
+redundancy
+!
+!
+!
+no crypto ikev2 diagnose error
+!
+!
+!
+!
+class-map type inspect match-any Telnet-SSH-Policy-s1-l4-cm_
+ match protocol telnet
+class-map type inspect match-all Telnet-SSH-Policy-seq-11-cm_
+ match access-group name Telnet-SSH-Policy-seq-11-acl_
+class-map type inspect match-all Telnet-SSH-Policy-seq-1-cm_
+ match class-map Telnet-SSH-Policy-s1-l4-cm_
+!
+policy-map type inspect Telnet-SSH-Policy
+ class type inspect Telnet-SSH-Policy-seq-1-cm_
+  drop log
+ class type inspect Telnet-SSH-Policy-seq-11-cm_
+  pass log
+ class class-default
+  drop
+!
+zone security Zone1
+ vpn 1
+zone security Zone2
+ vpn 2
+zone-pair security ZP_Zone1_Zone1_Telnet-SSH-Policy source Zone1 destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+zone-pair security ZP_Zone1_Zone2_Telnet-SSH-Policy source Zone1 destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+zone-pair security ZP_Zone2_Zone1_Telnet-SSH-Policy source Zone2 destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+zone-pair security ZP_Zone2_Zone2_Telnet-SSH-Policy source Zone2 destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+zone-pair security ZP_self_Zone1_Telnet-SSH-Policy source self destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+zone-pair security ZP_self_Zone2_Telnet-SSH-Policy source self destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback65528
+ vrf forwarding 65528
+ ip address 192.168.1.1 255.255.255.255
+!
+interface Tunnel1
+ ip unnumbered GigabitEthernet1
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet1
+ no ipv6 redirects
+ tunnel source GigabitEthernet1
+ tunnel mode sdwan
+!
+interface GigabitEthernet1
+ ip address 100.0.0.2 255.255.255.0
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet2
+ vrf forwarding 1
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet3
+ vrf forwarding 2
+ ip address 192.168.2.1 255.255.255.0
+ negotiation auto
+ arp timeout 1200
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet4
+ no ip address
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+router omp
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+!
+ip nat route vrf 65528 0.0.0.0 0.0.0.0 global
+no ip nat service skinny tcp port 2000
+no ip nat service sip tcp port 5060
+no ip nat service sip udp port 5060
+no ip nat service H225
+no ip nat service ras
+no ip nat service rtsp udp
+no ip nat service rtsp tcp
+no ip nat service dns tcp
+no ip nat service dns udp
+no ip nat service netbios-ns tcp
+no ip nat service netbios-ns udp
+no ip nat service netbios-ssn
+no ip nat service netbios-dgm
+no ip nat service ldap
+no ip nat service sunrpc udp
+no ip nat service sunrpc tcp
+no ip nat service msrpc tcp
+no ip nat service tftp
+no ip nat service rcmd
+no ip nat service pptp
+no ip nat service ftp
+no ip nat service gatekeeper
+no ip nat service dns-reset-ttl
+ip route 0.0.0.0 0.0.0.0 100.0.0.100
+ip scp server enable
+!
+ip access-list extended Telnet-SSH-Policy-seq-11-acl_
+ 11 permit object-group Telnet-SSH-Policy-seq-11-service-og_ any any
+!
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 80
+ transport input ssh
+!
+nat64 translation timeout udp 1
+nat64 translation timeout tcp 60
+!
+!
+!
+!
+!
+netconf-yang
+netconf-yang feature candidate-datastore
+end
+******************
+
+
+
+cEdge2#show sdwan running-config 
+system
+ system-ip             1.0.2.1
+ overlay-id            1
+ site-id               2
+ port-offset           0
+ control-session-pps   300
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ port-hop
+ track-transport
+ track-default-gateway
+ console-baud-rate     9600
+ vbond 10.0.0.2 port 12346
+!
+no service pad
+service password-encryption
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service tcp-small-servers
+no service udp-small-servers
+platform console serial
+platform punt-keepalive disable-kernel-core
+hostname cEdge2
+username admin privilege 15 secret 9 $9$3V6L3V6L2VUI2k$ysPnXOdg8RLj9KgMdmfHdSHkdaMmiHzGaUpcqH6pfTo
+vrf definition 1
+ rd 1:1
+ address-family ipv4
+  route-target export 1:1
+  route-target import 1:1
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+vrf definition 2
+ rd 1:2
+ address-family ipv4
+  route-target export 1:2
+  route-target import 1:2
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+vrf definition Mgmt-intf
+ description Transport VPN
+ rd          1:512
+ address-family ipv4
+  route-target export 1:512
+  route-target import 1:512
+  exit-address-family
+ !
+ address-family ipv6
+  exit-address-family
+ !
+!
+no ip dhcp use class
+ip route 0.0.0.0 0.0.0.0 100.0.0.100 1
+no ip source-route
+ip access-list extended Telnet-SSH-Policy-seq-11-acl_
+ 11 permit object-group Telnet-SSH-Policy-seq-11-service-og_ any any
+!
+no ip http server
+ip http secure-server
+no ip http ctc authentication
+no ip igmp ssm-map query dns
+ipv6 unicast-routing
+class-map type inspect match-any Telnet-SSH-Policy-s1-l4-cm_
+ match protocol telnet
+!
+class-map type inspect match-all Telnet-SSH-Policy-seq-1-cm_
+ match class-map Telnet-SSH-Policy-s1-l4-cm_
+!
+class-map type inspect match-all Telnet-SSH-Policy-seq-11-cm_
+ match access-group name Telnet-SSH-Policy-seq-11-acl_
+!
+policy-map type inspect Telnet-SSH-Policy
+ class Telnet-SSH-Policy-seq-1-cm_
+   drop log
+ !
+ class Telnet-SSH-Policy-seq-11-cm_
+   pass log
+ !
+ class class-default
+   drop
+ !
+!
+interface GigabitEthernet1
+ no shutdown
+ arp timeout 1200
+ ip address 100.0.0.2 255.255.255.0
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet2
+ no shutdown
+ arp timeout 1200
+ vrf forwarding 1
+ ip address 192.168.1.1 255.255.255.0
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet3
+ no shutdown
+ arp timeout 1200
+ vrf forwarding 2
+ ip address 192.168.2.1 255.255.255.0
+ ip redirects
+ ip mtu    1500
+ mtu 1500
+ negotiation auto
+exit
+interface GigabitEthernet4
+ no shutdown
+ no ip address
+exit
+interface Tunnel1
+ no shutdown
+ ip unnumbered GigabitEthernet1
+ no ip redirects
+ ipv6 unnumbered GigabitEthernet1
+ no ipv6 redirects
+ tunnel source GigabitEthernet1
+ tunnel mode sdwan
+exit
+object-group service Telnet-SSH-Policy-seq-11-service-og_
+ ip
+!
+clock timezone UTC 0 0
+logging persistent size 104857600 filesize 10485760
+logging buffered 512000
+no logging rate-limit
+logging persistent
+aaa authentication login default local
+aaa authorization exec default local
+parameter-map type inspect-global
+ alert on
+ log dropped-packets
+ multi-tenancy
+ vpn zone security
+!
+zone security Zone1
+ vpn 1
+!
+zone security Zone2
+ vpn 2
+!
+zone-pair security ZP_Zone1_Zone1_Telnet-SSH-Policy source Zone1 destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+!
+zone-pair security ZP_Zone1_Zone2_Telnet-SSH-Policy source Zone1 destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+!
+zone-pair security ZP_Zone2_Zone1_Telnet-SSH-Policy source Zone2 destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+!
+zone-pair security ZP_Zone2_Zone2_Telnet-SSH-Policy source Zone2 destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+!
+zone-pair security ZP_self_Zone1_Telnet-SSH-Policy source self destination Zone1
+ service-policy type inspect Telnet-SSH-Policy
+!
+zone-pair security ZP_self_Zone2_Telnet-SSH-Policy source self destination Zone2
+ service-policy type inspect Telnet-SSH-Policy
+!
+no crypto ikev2 diagnose error
+no crypto isakmp diagnose error
+line con 0
+ login authentication default
+ speed    9600
+ stopbits 1
+!
+line vty 0 4
+ login authentication default
+ transport input ssh
+!
+line vty 5 80
+ login authentication default
+ transport input ssh
+!
+nat64 translation timeout tcp 60
+nat64 translation timeout udp 1
+sdwan
+ interface GigabitEthernet1
+  tunnel-interface
+   encapsulation ipsec weight 1
+   no border
+   color biz-internet
+   no last-resort-circuit
+   no low-bandwidth-link
+   control-connections
+   no vbond-as-stun-server
+   vmanage-connection-preference 5
+   port-hop
+   carrier                       default
+   nat-refresh-interval          5
+   hello-interval                1000
+   hello-tolerance               12
+   allow-service all
+   no allow-service bgp
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service ospf
+   no allow-service stun
+   no allow-service snmp
+  exit
+ exit
+ omp
+  no shutdown
+  send-path-limit  4
+  ecmp-limit       4
+  graceful-restart
+  no as-dot-notation
+  timers
+   holdtime               60
+   advertisement-interval 1
+   graceful-restart-timer 43200
+   eor-timer              300
+  exit
+  address-family ipv4 vrf 1
+   advertise connected
+  !
+  address-family ipv4 vrf 2
+   advertise connected
+  !
+  address-family ipv4
+   advertise connected
+   advertise static
+  !
+  address-family ipv6
+   advertise connected
+   advertise static
+  !
+ !
+!
+licensing config enable false
+licensing config privacy hostname false
+licensing config privacy version false
+licensing config utility utility-enable false
+netconf-yang cisco-ia blocking cli-blocking-enabled
+bfd app-route multiplier 6
+bfd app-route poll-interval 600000
+omp
+ no as-dot-notation
+!
+security
+ ipsec
+  rekey               86400
+  replay-window       512
+  authentication-type sha1-hmac ah-sha1-hmac
+ !
+!
+classifiers classifier-entry Telnet-SSH-Policy-s1-l4-cm_
+ classifier-entry-filter-operation match-any-filter
+ filter-entry ip-rtp false
+ !
+ filter-entry ip-rtp true
+ !
+!
+classifiers classifier-entry Telnet-SSH-Policy-seq-1-cm_
+ classifier-entry-filter-operation match-all-filter
+ filter-entry ip-rtp false
+ !
+ filter-entry ip-rtp true
+ !
+!
+classifiers classifier-entry Telnet-SSH-Policy-seq-11-cm_
+ classifier-entry-filter-operation match-all-filter
+ filter-entry ipv4-acl-name false
+  ipv4-acl-name-cfgs ipv4-acl-name-cfg Telnet-SSH-Policy-seq-11-acl_
+  !
+ !
+ filter-entry ip-rtp false
+ !
+ filter-entry ip-rtp true
+ !
+!
+policies policy-entry Telnet-SSH-Policy
+ classifier-entry Telnet-SSH-Policy-seq-1-cm_
+ !
+ classifier-entry Telnet-SSH-Policy-seq-11-cm_
+ !
+ classifier-entry class-default
+ !
+!
+nacm cmd-read-default deny
+nacm cmd-exec-default deny
+policy
+ no app-visibility
+ no flow-visibility
+ no implicit-acl-logging
+ log-frequency        1000
+!
+
+cEdge2#

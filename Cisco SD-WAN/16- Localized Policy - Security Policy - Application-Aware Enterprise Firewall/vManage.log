@@ -1,0 +1,68 @@
+﻿
+viptela 19.3.0 
+
+vmanage login: admin
+Password: 
+Welcome to Viptela CLI
+admin connected from 127.0.0.1 using console on vmanage
+vmanage# sh run
+system
+ host-name             vmanage
+ system-ip             1.0.0.3
+ site-id               100
+ admin-tech-on-failure
+ sp-organization-name  IMANMTZ
+ organization-name     IMANMTZ
+ vbond 10.0.0.2
+ aaa
+  auth-order local radius tacacs
+  usergroup basic
+   task system read write
+   task interface read write
+  !
+  usergroup netadmin
+  !
+  usergroup operator
+   task system read
+   task interface read
+   task policy read
+   task routing read
+   task security read
+  !
+  usergroup tenantadmin
+  !
+  user admin
+   password $6$r4l4bSFrR0SFo0Su$cl0TWAQkShjS8C.N7DozIlPAocwoF5l6/wXihu.yYeZqboD5rBbLtpzIaE9Zi5LC1fQYefk//dzAhPY9pAWhG/
+  !
+ !
+ logging
+  disk
+   enable
+  !
+ !
+!
+vpn 0
+ interface eth0
+  ip address 10.0.0.3/24
+  ipv6 dhcp-client
+  tunnel-interface
+   allow-service all
+   allow-service dhcp
+   allow-service dns
+   allow-service icmp
+   no allow-service sshd
+   no allow-service netconf
+   no allow-service ntp
+   no allow-service stun
+   allow-service https
+  !
+  no shutdown
+ !
+ ip route 0.0.0.0/0 10.0.0.1
+!
+vpn 512
+ interface eth1
+  ip address 172.16.1.11/24
+  no shutdown
+ !
+!
